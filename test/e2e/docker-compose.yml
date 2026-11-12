@@ -1,0 +1,46 @@
+# Test environment: the main node plus three "hosts". Each host is a
+# Docker-in-Docker container, i.e. a container that runs its own Docker
+# daemon, with its own IP address in the test network. From lanproxy's
+# point of view they behave like three separate machines.
+#
+# Use ./run.sh; it also starts agents and sample containers in the hosts.
+name: lanproxy-e2e
+
+services:
+  lanproxy:
+    build:
+      context: ../..
+      dockerfile: deploy/controller/Dockerfile
+    ports:
+      - "18080:8080"
+      - "18443:443"
+    networks:
+      lab:
+        ipv4_address: 172.30.0.10
+
+  host1: &host
+    image: docker:27-dind
+    privileged: true # required by Docker-in-Docker
+    environment:
+      DOCKER_TLS_CERTDIR: "" # plain socket, no TLS setup needed
+    networks:
+      lab:
+        ipv4_address: 172.30.0.11
+
+  host2:
+    <<: *host
+    networks:
+      lab:
+        ipv4_address: 172.30.0.12
+
+  host3:
+    <<: *host
+    networks:
+      lab:
+        ipv4_address: 172.30.0.13
+
+networks:
+  lab:
+    ipam:
+      config:
+        - subnet: 172.30.0.0/24

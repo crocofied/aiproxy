@@ -8,7 +8,7 @@ ARG TARGETOS
 ARG TARGETARCH
 ARG VERSION=dev
 WORKDIR /src
-COPY go.mod go.sum* ./
+COPY go.mod go.sum ./
 COPY api ./api
 COPY cmd/agent ./cmd/agent
 COPY internal/agent ./internal/agent

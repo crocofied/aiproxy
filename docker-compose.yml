@@ -1,0 +1,29 @@
+# lanproxy main node: Traefik + controller in one container.
+# Start with:  docker compose up -d --build   (or start.sh / start.ps1)
+services:
+  lanproxy:
+    image: lanproxy:latest
+    build:
+      context: .
+      dockerfile: deploy/controller/Dockerfile
+    container_name: lanproxy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      # Direct access to the web interface, also before a certificate exists.
+      - "${LANPROXY_UI_PORT:-8080}:8080"
+    volumes:
+      # Everything persistent: database, certificates, Traefik config.
+      - lanproxy-data:/data
+    # Optional values that pre-fill the setup wizard, see .env.example.
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      # Where hosts get the agent image from; appears in the compose
+      # file the web interface generates for new agents.
+      LANPROXY_AGENT_BUILD_CONTEXT: ${LANPROXY_AGENT_BUILD_CONTEXT:-https://github.com/crocofied/aiproxy.git#main}
+
+volumes:
+  lanproxy-data:

@@ -1,6 +1,6 @@
 /bin/
-/web/node_modules/
-/web/build/
-/web/.svelte-kit/
 *.env
+.env
 !*.env.example
+/internal/controller/ui/dist/*
+!/internal/controller/ui/dist/.gitkeep

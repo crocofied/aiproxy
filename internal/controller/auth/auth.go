@@ -22,7 +22,6 @@ const (
 	// MaxPasswordLength exists because bcrypt only looks at the first
 	// 72 bytes; rather than silently ignoring the rest we reject it.
 	MaxPasswordLength = 72
-
 )
 
 // Cost is the bcrypt work factor. 12 takes roughly a quarter of a

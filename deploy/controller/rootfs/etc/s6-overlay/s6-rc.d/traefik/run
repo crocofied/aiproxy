@@ -1,0 +1,14 @@
+#!/bin/sh
+# Traefik is started WITHOUT the container's environment, so settings and
+# secrets meant for the controller never reach it.
+
+# The controller writes this file when it starts; wait for it.
+while [ ! -f /data/traefik/traefik.yml ]; do
+    sleep 1
+done
+
+# s6-envdir turns every file in the directory into an environment
+# variable (file name = name, content = value). That is how the DNS
+# provider credentials reach Traefik: no shell ever parses them.
+exec /command/s6-envdir /data/secrets/dns-env \
+    /usr/local/bin/traefik --configfile=/data/traefik/traefik.yml

@@ -6,6 +6,8 @@ import (
 	"testing"
 )
 
+func init() { Cost = 4 } // the minimum: keeps the tests fast
+
 func TestPassword(t *testing.T) {
 	hash, err := HashPassword("correct horse")
 	if err != nil {

@@ -137,14 +137,24 @@ func (s *Server) resyncLabelRoutes(ctx context.Context, settings store.Settings)
 	return nil
 }
 
+// sortedKeys returns the keys of m in sorted order. The result is never
+// nil: a nil slice would be sent as JSON null, which the web interface
+// does not expect where it wants a list.
+func sortedKeys(m map[string]string) []string {
+	keys := slices.Sorted(maps.Keys(m))
+	if keys == nil {
+		keys = []string{}
+	}
+	return keys
+}
+
 func (s *Server) settingsResponse(settings store.Settings) (settingsResponse, error) {
 	env, err := traefik.ReadDNSEnv(s.Paths.DNSEnvDir)
 	if err != nil {
 		return settingsResponse{}, err
 	}
-	// Only the names leave the server; maps.Keys drops the values.
-	keys := slices.Sorted(maps.Keys(env))
-	return settingsResponse{Settings: settings, UIHost: settings.UIHost(), DNSEnvKeys: keys}, nil
+	// Only the names leave the server, never the values.
+	return settingsResponse{Settings: settings, UIHost: settings.UIHost(), DNSEnvKeys: sortedKeys(env)}, nil
 }
 
 // handleSetupDefaults returns the values the wizard starts with. It
@@ -164,7 +174,7 @@ func (s *Server) handleSetupDefaults(w http.ResponseWriter, r *http.Request) {
 		"settings": settings,
 		// Secrets from the environment are announced, not revealed.
 		"password_preset": p.AdminPassword != "",
-		"dns_env_preset":  slices.Sorted(maps.Keys(p.DNSEnv)),
+		"dns_env_preset":  sortedKeys(p.DNSEnv),
 	})
 }
 

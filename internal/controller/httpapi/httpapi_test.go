@@ -223,6 +223,13 @@ func TestSetupAndLogin(t *testing.T) {
 		t.Errorf("unauthenticated request: status %d, want 401", code)
 	}
 
+	// Lists in the wizard defaults are [] and not null, even when empty.
+	var defaults map[string]json.RawMessage
+	e.call("GET", "/api/setup", nil, &defaults)
+	if string(defaults["dns_env_preset"]) != "[]" || string(defaults["password_preset"]) != "false" {
+		t.Errorf("setup defaults: %s", defaults)
+	}
+
 	// Invalid input is rejected and leaves the setup open.
 	bad := setupBody()
 	bad["base_domain"] = "not a domain"

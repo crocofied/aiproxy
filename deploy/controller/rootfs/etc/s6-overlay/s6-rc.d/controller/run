@@ -1,0 +1,5 @@
+#!/command/with-contenv sh
+# with-contenv passes the container's environment variables (LANPROXY_*)
+# on to the controller. "exec" replaces the shell, so s6 supervises the
+# controller process directly.
+exec /usr/local/bin/lanproxy-controller

@@ -1,0 +1,10 @@
+.git
+bin
+web/node_modules
+web/build
+web/.svelte-kit
+internal/controller/ui/dist/*
+!internal/controller/ui/dist/.gitkeep
+.env
+*.env
+test

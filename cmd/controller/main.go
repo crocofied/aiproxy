@@ -55,6 +55,10 @@ func run(cfg config.Config, log *slog.Logger) error {
 	if err := os.MkdirAll(cfg.DataDir, 0o700); err != nil {
 		return err
 	}
+	// A Docker volume already exists with wider permissions; tighten it.
+	if err := os.Chmod(cfg.DataDir, 0o700); err != nil {
+		log.Warn("cannot restrict permissions of the data directory", "error", err)
+	}
 	paths := traefik.PathsIn(cfg.DataDir)
 	if err := paths.EnsureDirs(); err != nil {
 		return err

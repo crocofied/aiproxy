@@ -1,0 +1,30 @@
+version: "2"
+
+linters:
+  default: standard
+  enable:
+    - bodyclose    # HTTP response bodies must be closed
+    - errorlint    # correct use of errors.Is / errors.As / %w
+    - gocritic
+    - misspell
+    - noctx        # network calls must carry a context
+    - revive
+    - unconvert
+  settings:
+    errcheck:
+      exclude-functions:
+        # Closing something we only read from cannot lose data, so
+        # "defer x.Close()" without an error check is fine.
+        - (io.Closer).Close
+        - (*net/http.Response).Body.Close
+        - (net.Conn).Close
+  exclusions:
+    rules:
+      # Tests may be more relaxed.
+      - path: _test\.go
+        linters: [errcheck, noctx]
+
+formatters:
+  enable:
+    - gofmt
+    - goimports

@@ -1,0 +1,30 @@
+# lanproxy agent: reports the containers of this Docker host to the controller.
+# Put the two required values into a .env file next to this file:
+#   LANPROXY_CONTROLLER_URL=...   address of the controller
+#   LANPROXY_AGENT_TOKEN=...      token from "Agent hinzufügen" in the UI
+services:
+  lanproxy-agent:
+    image: lanproxy-agent:latest
+    build:
+      context: ../..
+      dockerfile: deploy/agent/Dockerfile
+    restart: unless-stopped
+    # Host networking lets the agent see the host's real IP address.
+    # The agent opens no listening port. Without host networking you must
+    # set LANPROXY_HOST_IP yourself.
+    network_mode: host
+    environment:
+      LANPROXY_CONTROLLER_URL: ${LANPROXY_CONTROLLER_URL:?set LANPROXY_CONTROLLER_URL}
+      LANPROXY_AGENT_TOKEN: ${LANPROXY_AGENT_TOKEN:?set LANPROXY_AGENT_TOKEN}
+      # Optional:
+      # LANPROXY_HOST_IP: ""               # default: detected automatically
+      # LANPROXY_HEARTBEAT_INTERVAL: 30s
+      # LANPROXY_LOG_LEVEL: info           # debug | info | warn | error
+    volumes:
+      # ":ro" does not restrict the Docker API. The agent only sends two
+      # read requests; for stricter isolation put a docker-socket-proxy
+      # in front and point LANPROXY_DOCKER_SOCKET at it.
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    read_only: true
+    security_opt:
+      - no-new-privileges:true

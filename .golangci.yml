@@ -18,6 +18,9 @@ linters:
         - (io.Closer).Close
         - (*net/http.Response).Body.Close
         - (net.Conn).Close
+        - (*os.File).Close
+        - (*database/sql.Rows).Close
+        - os.Remove
   exclusions:
     rules:
       # Tests may be more relaxed.
